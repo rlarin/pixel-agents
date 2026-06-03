@@ -1,0 +1,25 @@
+<idea-plugin>
+    <id>com.pixelagents.jetbrains</id>
+    <name>Pixel Agents</name>
+    <vendor url="https://github.com/pixel-agents-hq/pixel-agents">pixel-agents-hq</vendor>
+    <description>
+        Pixel art office where AI agents (Claude Code terminals) are animated characters.
+        Requires Node.js to be installed.
+    </description>
+
+    <depends>com.intellij.modules.platform</depends>
+    <depends>org.jetbrains.plugins.terminal</depends>
+
+    <extensions defaultExtensionNs="com.intellij">
+        <toolWindow
+            id="Pixel Agents"
+            anchor="bottom"
+            factoryClass="com.pixelagents.PixelAgentsToolWindowFactory"/>
+        <projectService
+            serviceImplementation="com.pixelagents.PixelAgentsService"/>
+        <notificationGroup
+            id="Pixel Agents"
+            displayType="BALLOON"
+            isLogByDefault="true"/>
+    </extensions>
+</idea-plugin>
