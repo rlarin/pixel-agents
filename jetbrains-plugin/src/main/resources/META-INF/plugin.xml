@@ -3,7 +3,10 @@
     <name>Pixel Agents</name>
     <vendor url="https://github.com/pixel-agents-hq/pixel-agents">pixel-agents-hq</vendor>
     <description>
-        Pixel art office where AI agents (Claude Code terminals) are animated characters.
+        JetBrains edition of Pixel Agents — a pixel art office where AI agents (Claude Code terminals)
+        are animated characters you can watch work in real time.
+
+        Compatible with PyCharm, WebStorm, and all JetBrains IDEs based on IntelliJ Platform 2025.1+.
         Requires Node.js to be installed.
     </description>
 

@@ -39,7 +39,13 @@ intellijPlatform {
         id = "com.pixelagents.jetbrains"
         name = "Pixel Agents"
         version = "0.1.0"
-        description = "Pixel art office where AI agents (Claude Code terminals) are animated characters."
+        description = """
+            JetBrains edition of Pixel Agents — a pixel art office where AI agents (Claude Code terminals)
+            are animated characters you can watch work in real time.
+
+            Compatible with PyCharm, WebStorm, and all JetBrains IDEs based on IntelliJ Platform 2025.1+.
+            Requires Node.js to be installed.
+        """.trimIndent()
         ideaVersion {
             sinceBuild = "251"
         }
