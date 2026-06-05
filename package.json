@@ -100,6 +100,7 @@
     "e2e:debug": "playwright test --config e2e/playwright.config.ts --debug",
     "knip": "knip",
     "build:jetbrains": "powershell -Command \"$env:JAVA_HOME=\\\"$env:USERPROFILE\\\\jdks\\\\jdk-21.0.5+11\\\"; Set-Location jetbrains-plugin; .\\\\gradlew.bat buildPlugin\"",
+    "publish:jetbrains": "powershell -ExecutionPolicy Bypass -File scripts/publish-jetbrains.ps1",
     "build:jetbrains:unix": "cd jetbrains-plugin && JAVA_HOME=$HOME/jdks/jdk-21.0.5+11 ./gradlew buildPlugin"
   },
   "devDependencies": {

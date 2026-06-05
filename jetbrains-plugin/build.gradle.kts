@@ -53,8 +53,9 @@ intellijPlatform {
             <ul>
                 <li><b>New app icon</b> — fresh pixel-art office illustration used as the extension icon.</li>
                 <li><b>Custom toolbar icon</b> — dedicated SVG icon now appears in the JetBrains tool window tab instead of the generic window icon.</li>
-                <li><b>Fix: Export Layout now works</b> — previously clicking Export Layout in Settings did nothing in JetBrains. It now downloads the current layout as a JSON file directly from the browser.</li>
-                <li><b>Fix: Import Layout now works</b> — previously clicking Import Layout in Settings did nothing in JetBrains. It now opens a browser file picker, validates the selected layout, and applies it immediately.</li>
+                <li><b>Fix: Export Layout now works</b> — previously clicking Export Layout in Settings did nothing in JetBrains. It now opens a native save dialog and writes the current layout to a JSON file.</li>
+                <li><b>Fix: Import Layout now works</b> — previously clicking Import Layout in Settings did nothing in JetBrains. It now opens a native file picker, validates the selected layout, and applies it immediately.</li>
+                <li><b>Fix: Open Sessions Folder now works</b> — it now reveals the Claude sessions folder for the current project in your OS file manager.</li>
             </ul>
             <h3>0.3.0</h3>
             <ul>
