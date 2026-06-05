@@ -8,7 +8,7 @@ plugins {
 }
 
 group = "com.pixelagents"
-version = "0.3.1"
+version = "0.3.2"
 
 repositories {
     mavenCentral()
@@ -38,7 +38,7 @@ intellijPlatform {
     pluginConfiguration {
         id = "io.github.rlarin.pixelagents"
         name = "IT Crowd Pixel Agents"
-        version = "0.3.1"
+        version = "0.3.2"
         description = """
             JetBrains edition of Pixel Agents — a pixel art office where AI agents (Claude Code terminals)
             are animated characters you can watch work in real time.
@@ -49,13 +49,16 @@ intellijPlatform {
             Based on Pixel Agents by Pablo De Lucca (https://github.com/pixel-agents-hq/pixel-agents), MIT licensed.
         """.trimIndent()
         changeNotes = """
+            <h3>0.3.2</h3>
+            <ul>
+                <li><b>Fix: Export Layout now works</b> — previously clicking Export Layout in Settings did nothing in JetBrains. It now opens a native save dialog and writes the current layout to a JSON file.</li>
+                <li><b>Fix: Import Layout now works</b> — previously clicking Import Layout in Settings did nothing in JetBrains. It now opens a native file picker, validates the selected layout, and applies it immediately.</li>
+                <li><b>Fix: Open Sessions Folder now works</b> — it now reveals the Claude sessions folder for the current project in your OS file manager.</li>
+            </ul>
             <h3>0.3.1</h3>
             <ul>
                 <li><b>New app icon</b> — fresh pixel-art office illustration used as the extension icon.</li>
                 <li><b>Custom toolbar icon</b> — dedicated SVG icon now appears in the JetBrains tool window tab instead of the generic window icon.</li>
-                <li><b>Fix: Export Layout now works</b> — previously clicking Export Layout in Settings did nothing in JetBrains. It now opens a native save dialog and writes the current layout to a JSON file.</li>
-                <li><b>Fix: Import Layout now works</b> — previously clicking Import Layout in Settings did nothing in JetBrains. It now opens a native file picker, validates the selected layout, and applies it immediately.</li>
-                <li><b>Fix: Open Sessions Folder now works</b> — it now reveals the Claude sessions folder for the current project in your OS file manager.</li>
             </ul>
             <h3>0.3.0</h3>
             <ul>
