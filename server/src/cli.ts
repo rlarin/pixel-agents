@@ -139,8 +139,11 @@ async function main(): Promise<void> {
       }
     }
 
-    // Start scanning for external sessions (Claude running in user's terminal)
-    const cwd = process.cwd();
+    // Start scanning for external sessions (Claude running in user's terminal).
+    // The host (e.g. JetBrains plugin) may launch us from a neutral working dir
+    // — to dodge npm exec resolving a same-named local package — and pass the
+    // real project via PIXEL_AGENTS_PROJECT_DIR. Fall back to cwd otherwise.
+    const cwd = process.env.PIXEL_AGENTS_PROJECT_DIR || process.cwd();
     const dirs = claudeProvider.getSessionDirs?.(cwd);
     if (dirs && dirs[0]) {
       const projectDir = dirs[0];

@@ -33,10 +33,16 @@ class ServerManager(
             listOf("cmd", "/c", "npx", "-y", "it-crowd-pixel-agents")
         else
             listOf("npx", "-y", "it-crowd-pixel-agents")
-        ProcessBuilder(cmd)
-            .directory(File(dir))
+        // Run npx from a neutral directory (user home), NOT the project dir:
+        // if the open project itself is the "it-crowd-pixel-agents" package
+        // (e.g. its own repo), `npm exec` resolves the local package and fails
+        // with "is not recognized", so the server never starts. The real
+        // project is passed to the server via PIXEL_AGENTS_PROJECT_DIR instead.
+        val pb = ProcessBuilder(cmd)
+            .directory(File(System.getProperty("user.home")))
             .redirectErrorStream(true)
-            .start()
+        pb.environment()["PIXEL_AGENTS_PROJECT_DIR"] = dir
+        pb.start()
     },
     private val healthChecker: (Int) -> Boolean = { port ->
         try {
