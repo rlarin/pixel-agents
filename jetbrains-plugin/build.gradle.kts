@@ -51,6 +51,7 @@ intellijPlatform {
         changeNotes = """
             <h3>0.3.4</h3>
             <ul>
+                <li><b>Fix: server failed to start in some projects</b> — the background server is now launched from a neutral directory, so it no longer fails when the open project happens to share a name with an npm package. The real project is still scanned correctly.</li>
                 <li><b>Clear startup errors</b> — if the background server can't start (e.g. Node.js not installed), the panel now shows a helpful message and a Retry instead of an endless "Loading…".</li>
             </ul>
             <h3>0.3.3</h3>
