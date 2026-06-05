@@ -26,6 +26,7 @@ export type ServerMessage =
   | AgentTeamInfo
   | AgentTokenUsage
   | LayoutLoaded
+  | LayoutExportReady
   | FurnitureAssetsLoaded
   | CharacterSpritesLoaded
   | FloorTilesLoaded
@@ -50,6 +51,7 @@ export type ClientMessage =
   | SetWatchAllSessions
   | ExportLayout
   | ImportLayout
+  | ImportLayoutData
   | OpenSessionsFolder
   | AddExternalAssetDirectory
   | RemoveExternalAssetDirectory
@@ -179,6 +181,12 @@ export interface LayoutLoaded {
   type: 'layoutLoaded';
   layout: Record<string, any> | null;
   wasReset?: boolean;
+}
+
+export interface LayoutExportReady {
+  type: 'layoutExportReady';
+  layout: Record<string, any>;
+  filename: string;
 }
 
 export interface FurnitureAssetsLoaded {
@@ -334,6 +342,11 @@ export interface ExportLayout {
 
 export interface ImportLayout {
   type: 'importLayout';
+}
+
+export interface ImportLayoutData {
+  type: 'importLayoutData';
+  layout: Record<string, any>;
 }
 
 export interface OpenSessionsFolder {

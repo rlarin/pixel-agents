@@ -6,6 +6,9 @@ declare global {
   interface Window {
     pixelAgentsBridge?: {
       launchAgent: (folderPath: string | undefined, bypassPermissions: boolean | undefined) => void;
+      openSessionsFolder: () => void;
+      exportLayout: () => void;
+      importLayout: (cb: (layoutJson: string) => void) => void;
     };
   }
 }
@@ -39,6 +42,28 @@ export class JetBrainsTransport implements MessageTransport {
         });
         this.waitForBridge();
       }
+      return;
+    }
+    // Native IDE actions (file dialogs, OS reveal) — routed to the Kotlin bridge.
+    // JBCef blocks browser downloads and <input type=file>, so these can't run in-page.
+    if (message.type === 'openSessionsFolder') {
+      window.pixelAgentsBridge?.openSessionsFolder();
+      return;
+    }
+    if (message.type === 'exportLayout') {
+      window.pixelAgentsBridge?.exportLayout();
+      return;
+    }
+    if (message.type === 'importLayout') {
+      window.pixelAgentsBridge?.importLayout((layoutJson) => {
+        if (!layoutJson) return;
+        try {
+          const layout = JSON.parse(layoutJson) as Record<string, unknown>;
+          this.ws.send({ type: 'importLayoutData', layout } as ClientMessage);
+        } catch {
+          console.warn('[JetBrains] importLayout: invalid JSON from native picker');
+        }
+      });
       return;
     }
     this.ws.send(message);

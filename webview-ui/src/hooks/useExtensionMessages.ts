@@ -133,6 +133,17 @@ export function useExtensionMessages(
         return;
       }
 
+      if (msg.type === 'layoutExportReady') {
+        const blob = new Blob([JSON.stringify(msg.layout, null, 2)], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = (msg.filename as string) || 'pixel-agents-layout.json';
+        a.click();
+        URL.revokeObjectURL(url);
+        return;
+      }
+
       if (msg.type === 'layoutLoaded') {
         // Skip external layout updates while editor has unsaved changes
         if (layoutReadyRef.current && isEditDirty?.()) {

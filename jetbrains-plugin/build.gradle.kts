@@ -8,7 +8,7 @@ plugins {
 }
 
 group = "com.pixelagents"
-version = "0.3.0"
+version = "0.3.1"
 
 repositories {
     mavenCentral()
@@ -38,7 +38,7 @@ intellijPlatform {
     pluginConfiguration {
         id = "io.github.rlarin.pixelagents"
         name = "IT Crowd Pixel Agents"
-        version = "0.3.0"
+        version = "0.3.1"
         description = """
             JetBrains edition of Pixel Agents — a pixel art office where AI agents (Claude Code terminals)
             are animated characters you can watch work in real time.
@@ -47,6 +47,25 @@ intellijPlatform {
             Requires Node.js to be installed.
 
             Based on Pixel Agents by Pablo De Lucca (https://github.com/pixel-agents-hq/pixel-agents), MIT licensed.
+        """.trimIndent()
+        changeNotes = """
+            <h3>0.3.1</h3>
+            <ul>
+                <li><b>New app icon</b> — fresh pixel-art office illustration used as the extension icon.</li>
+                <li><b>Custom toolbar icon</b> — dedicated SVG icon now appears in the JetBrains tool window tab instead of the generic window icon.</li>
+                <li><b>Fix: Export Layout now works</b> — previously clicking Export Layout in Settings did nothing in JetBrains. It now downloads the current layout as a JSON file directly from the browser.</li>
+                <li><b>Fix: Import Layout now works</b> — previously clicking Import Layout in Settings did nothing in JetBrains. It now opens a browser file picker, validates the selected layout, and applies it immediately.</li>
+            </ul>
+            <h3>0.3.0</h3>
+            <ul>
+                <li>Tool window title set to "IT Crowd" with a real plugin icon.</li>
+                <li>Manual refresh button for agents and office view.</li>
+                <li>Widened <code>untilBuild</code> to 261.* for IntelliJ 2026.1 compatibility.</li>
+            </ul>
+            <h3>0.2.0</h3>
+            <ul>
+                <li>Initial JetBrains plugin release with embedded browser panel, Claude Code terminal integration, and standalone server.</li>
+            </ul>
         """.trimIndent()
         ideaVersion {
             sinceBuild = "251"

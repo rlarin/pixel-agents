@@ -101,6 +101,7 @@ components:
         - $ref: '#/components/schemas/AgentTokenUsage'
         # Layout
         - $ref: '#/components/schemas/LayoutLoaded'
+        - $ref: '#/components/schemas/LayoutExportReady'
         # Assets
         - $ref: '#/components/schemas/FurnitureAssetsLoaded'
         - $ref: '#/components/schemas/CharacterSpritesLoaded'
@@ -130,6 +131,7 @@ components:
         - $ref: '#/components/schemas/SetWatchAllSessions'
         - $ref: '#/components/schemas/ExportLayout'
         - $ref: '#/components/schemas/ImportLayout'
+        - $ref: '#/components/schemas/ImportLayoutData'
         - $ref: '#/components/schemas/OpenSessionsFolder'
         - $ref: '#/components/schemas/AddExternalAssetDirectory'
         - $ref: '#/components/schemas/RemoveExternalAssetDirectory'
@@ -708,6 +710,39 @@ components:
           const: setWatchAllSessions
         enabled:
           type: boolean
+
+    LayoutExportReady:
+      description: |
+        Server response to exportLayout — carries the layout JSON so the
+        webview can trigger a browser-native file download (used in
+        JetBrains / standalone mode where the host has no save dialog).
+      type: object
+      additionalProperties: false
+      required: [type, layout, filename]
+      properties:
+        type:
+          const: layoutExportReady
+        layout:
+          type: object
+          description: The full layout object to download.
+        filename:
+          type: string
+          description: Suggested filename for the download.
+
+    ImportLayoutData:
+      description: |
+        Carries a layout the user picked via a browser file-picker (used in
+        JetBrains / standalone mode). Server validates, saves to disk, and
+        responds with layoutLoaded.
+      type: object
+      additionalProperties: false
+      required: [type, layout]
+      properties:
+        type:
+          const: importLayoutData
+        layout:
+          type: object
+          description: The raw layout object parsed from the user-selected file.
 
     ExportLayout:
       description: Trigger layout export via host-native save dialog.

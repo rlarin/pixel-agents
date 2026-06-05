@@ -61,6 +61,23 @@ export function handleClientMessage(
       }
       break;
 
+    case 'exportLayout': {
+      const layout = readLayoutFromFile();
+      if (layout) {
+        send({ type: 'layoutExportReady', layout, filename: 'pixel-agents-layout.json' });
+      }
+      break;
+    }
+
+    case 'importLayoutData': {
+      const layout = msg.layout as Record<string, unknown> | undefined;
+      if (layout?.version === 1 && Array.isArray(layout?.tiles)) {
+        writeLayoutToFile(layout);
+        send({ type: 'layoutLoaded', layout, wasReset: false });
+      }
+      break;
+    }
+
     case 'saveAgentSeats':
       if (msg.seats) {
         adapter?.saveSeats(
