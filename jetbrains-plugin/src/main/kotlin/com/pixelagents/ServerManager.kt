@@ -38,9 +38,18 @@ class ServerManager(
         // (e.g. its own repo), `npm exec` resolves the local package and fails
         // with "is not recognized", so the server never starts. The real
         // project is passed to the server via PIXEL_AGENTS_PROJECT_DIR instead.
+        //
+        // Redirect the child's stdout+stderr to a logfile (NOT an inherited
+        // pipe). We never drain the child's output, so an undrained pipe would
+        // fill its ~64KB OS buffer and block Node's synchronous stdout writes,
+        // freezing the server event loop (alive PID, dead HTTP) — the classic
+        // "stuck on Loading..." failure. A file sink can never back-pressure.
+        val logFile = File(System.getProperty("user.home"), ".pixel-agents/server.log")
+        logFile.parentFile?.mkdirs()
         val pb = ProcessBuilder(cmd)
             .directory(File(System.getProperty("user.home")))
             .redirectErrorStream(true)
+            .redirectOutput(ProcessBuilder.Redirect.to(logFile))
         pb.environment()["PIXEL_AGENTS_PROJECT_DIR"] = dir
         pb.start()
     },

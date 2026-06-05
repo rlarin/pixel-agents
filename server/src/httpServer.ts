@@ -51,8 +51,13 @@ const startTime = Date.now();
  * framework-agnostic. If Fastify is ever replaced, only this file changes.
  */
 export async function createHttpServer(options: HttpServerOptions): Promise<HttpServerHandle> {
+  // Logger OFF in both modes. In standalone the process is launched by a host
+  // (JetBrains plugin) that may not drain our stdout; per-request pino logging
+  // fills the OS pipe buffer (~64KB) and Node's *synchronous* stdout write then
+  // blocks the event loop, freezing the server (alive PID, dead HTTP) and
+  // leaving the embedded browser stuck on "Loading...". Keep stdout near-empty.
   const app = Fastify({
-    logger: !options.embedded,
+    logger: false,
     bodyLimit: MAX_HOOK_BODY_SIZE,
   });
 
@@ -180,9 +185,9 @@ function registerWebSocketRoute(app: FastifyInstance, options: HttpServerOptions
     socket.on('message', (data: Buffer | string) => {
       try {
         const msg = JSON.parse(data.toString()) as Record<string, unknown>;
-        if (!options.embedded && msg.type) {
-          console.log('[Pixel Agents] WS client message:', msg.type);
-        }
+        // No per-message logging: a high-frequency console.log here fills an
+        // undrained host stdout pipe and deadlocks the event loop (see logger
+        // note above).
         handleClientMessage(msg, (m) => safeSend(socket, m), {
           store,
           runtime: options.runtime,

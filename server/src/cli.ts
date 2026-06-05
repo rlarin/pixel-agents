@@ -8,6 +8,10 @@
  * Each connecting WebSocket client receives the full state on webviewReady.
  */
 
+// Side-effect import: redirect console -> logfile BEFORE anything logs, so an
+// undrained host stdout pipe can never deadlock the event loop. Keep first.
+import './logRedirect.js';
+
 import * as path from 'path';
 
 import { AgentRuntime } from './agentRuntime.js';

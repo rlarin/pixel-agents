@@ -8,7 +8,7 @@ plugins {
 }
 
 group = "com.pixelagents"
-version = "0.3.4"
+version = "0.3.5"
 
 repositories {
     mavenCentral()
@@ -38,7 +38,7 @@ intellijPlatform {
     pluginConfiguration {
         id = "io.github.rlarin.pixelagents"
         name = "IT Crowd Pixel Agents"
-        version = "0.3.4"
+        version = "0.3.5"
         description = """
             JetBrains edition of Pixel Agents — a pixel art office where AI agents (Claude Code terminals)
             are animated characters you can watch work in real time.
@@ -49,6 +49,10 @@ intellijPlatform {
             Based on Pixel Agents by Pablo De Lucca (https://github.com/pixel-agents-hq/pixel-agents), MIT licensed.
         """.trimIndent()
         changeNotes = """
+            <h3>0.3.5</h3>
+            <ul>
+                <li><b>Fix: tool window froze on "Loading…" after a while</b> — the background server's output is now written to a log file instead of an undrained pipe. Previously the pipe's buffer could fill and block the server's event loop, leaving it alive but unresponsive. Server logs are now at <code>~/.pixel-agents/server.log</code>.</li>
+            </ul>
             <h3>0.3.4</h3>
             <ul>
                 <li><b>Fix: server failed to start in some projects</b> — the background server is now launched from a neutral directory, so it no longer fails when the open project happens to share a name with an npm package. The real project is still scanned correctly.</li>
