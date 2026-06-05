@@ -8,9 +8,11 @@ import { EditActionBar } from './components/EditActionBar.js';
 import { MigrationNotice } from './components/MigrationNotice.js';
 import { SettingsModal } from './components/SettingsModal.js';
 import { Tooltip } from './components/Tooltip.js';
+import { Button } from './components/ui/Button.js';
 import { Modal } from './components/ui/Modal.js';
 import { VersionIndicator } from './components/VersionIndicator.js';
 import { ZoomControls } from './components/ZoomControls.js';
+import { STARTUP_TIMEOUT_MS } from './constants.js';
 import { useEditorActions } from './hooks/useEditorActions.js';
 import { useEditorKeyboard } from './hooks/useEditorKeyboard.js';
 import { useExtensionMessages } from './hooks/useExtensionMessages.js';
@@ -75,6 +77,19 @@ function App() {
     setHooksEnabled,
     hooksInfoShown,
   } = useExtensionMessages(getOfficeState, editor.setLastSavedLayout, isEditDirty);
+
+  // Surface a helpful error instead of an infinite "Loading…" when the first
+  // layout never arrives (server failed to start — usually Node.js missing or
+  // the backend crashed). Cleared as soon as the layout loads.
+  const [startupTimedOut, setStartupTimedOut] = useState(false);
+  useEffect(() => {
+    if (layoutReady) {
+      setStartupTimedOut(false);
+      return;
+    }
+    const t = setTimeout(() => setStartupTimedOut(true), STARTUP_TIMEOUT_MS);
+    return () => clearTimeout(t);
+  }, [layoutReady]);
 
   // Show migration notice once layout reset is detected
   const [migrationNoticeDismissed, setMigrationNoticeDismissed] = useState(false);
@@ -168,7 +183,21 @@ function App() {
     })();
 
   if (!layoutReady) {
-    return <div className="w-full h-full flex items-center justify-center ">Loading...</div>;
+    if (startupTimedOut) {
+      return (
+        <div className="w-full h-full flex flex-col items-center justify-center gap-12 p-20 text-center">
+          <div className="text-sm">Couldn’t reach the Pixel Agents server.</div>
+          <div className="text-xs text-text-muted max-w-md">
+            The background server didn’t start. Make sure <b>Node.js</b> is installed and on your
+            PATH, then retry. (The plugin runs it via <code>npx</code>.)
+          </div>
+          <Button variant="accent" size="md" onClick={() => window.location.reload()}>
+            Retry
+          </Button>
+        </div>
+      );
+    }
+    return <div className="w-full h-full flex items-center justify-center ">Loading…</div>;
   }
 
   return (

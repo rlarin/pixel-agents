@@ -88,6 +88,10 @@ export const ZOOM_LEVEL_FADE_DURATION_SEC = 0.5;
 export const ZOOM_SCROLL_THRESHOLD = 50;
 export const PAN_MARGIN_FRACTION = 0.25;
 
+// ── Startup ──────────────────────────────────────────────────
+/** How long to wait for the first layout before showing a connection error instead of "Loading…". */
+export const STARTUP_TIMEOUT_MS = 25000;
+
 // ── Editor ───────────────────────────────────────────────────
 export const UNDO_STACK_MAX_SIZE = 50;
 export const LAYOUT_SAVE_DEBOUNCE_MS = 500;

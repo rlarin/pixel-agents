@@ -75,7 +75,9 @@ class PixelAgentsBrowserPanel(
             portFuture.thenAccept { port ->
                 browser?.loadURL("http://localhost:$port?ide=jetbrains")
             }.exceptionally { _ ->
-                // server failed to start — show nothing, browser remains at blank page
+                // Server failed to start (commonly: Node.js missing). Show a clear
+                // message instead of leaving the panel blank / stuck "Loading…".
+                browser?.loadHTML(SERVER_ERROR_HTML)
                 null
             }
 
@@ -192,5 +194,17 @@ class PixelAgentsBrowserPanel(
         launchAgentQuery?.dispose()
         nativeQuery?.dispose()
         browser?.dispose()
+    }
+
+    companion object {
+        private val SERVER_ERROR_HTML = """
+            <html><body style="font-family: sans-serif; background:#1e1e2e; color:#cdd6f4; padding:24px">
+                <h3>Couldn't start the Pixel Agents server</h3>
+                <p>The background server (launched via <code>npx</code>) didn't come up.</p>
+                <p>Make sure <b>Node.js</b> is installed and on your PATH, then reopen the tool window
+                   (or use the refresh button).</p>
+                <p style="opacity:.6">Check it from a terminal: <code>node --version</code></p>
+            </body></html>
+        """.trimIndent()
     }
 }

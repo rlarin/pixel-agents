@@ -52,6 +52,7 @@ intellijPlatform {
             <h3>0.3.3</h3>
             <ul>
                 <li><b>Fix: stuck on "Loading…"</b> — the tool window no longer hangs when a stale or hung background server is left behind by a previous run. The server is now health-checked before being reused, and a fresh one is started (on a free port) when needed.</li>
+                <li><b>Clear startup errors</b> — if the background server can't start (e.g. Node.js not installed), the panel now shows a helpful message and a Retry instead of an endless "Loading…".</li>
             </ul>
             <h3>0.3.2</h3>
             <ul>
