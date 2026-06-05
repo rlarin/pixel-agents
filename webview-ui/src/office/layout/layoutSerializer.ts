@@ -10,13 +10,17 @@ import type {
 import { DEFAULT_COLS, DEFAULT_ROWS, Direction, TILE_SIZE, TileType } from '../types.js';
 import { getCatalogEntry, getOrientationInGroup } from './furnitureCatalog.js';
 
-/** Convert flat tile array from layout into 2D grid */
+/** Convert flat tile array from layout into 2D grid.
+ *  Missing/invalid entries (e.g. a corrupt layout whose `tiles` array is
+ *  shorter than cols*rows) fall back to VOID so the office renders empty
+ *  instead of a wall of magenta "missing tile" markers. */
 export function layoutToTileMap(layout: OfficeLayout): TileTypeVal[][] {
   const map: TileTypeVal[][] = [];
   for (let r = 0; r < layout.rows; r++) {
     const row: TileTypeVal[] = [];
     for (let c = 0; c < layout.cols; c++) {
-      row.push(layout.tiles[r * layout.cols + c]);
+      const t = layout.tiles[r * layout.cols + c];
+      row.push(typeof t === 'number' ? t : TileType.VOID);
     }
     map.push(row);
   }
