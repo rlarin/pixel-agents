@@ -77,6 +77,37 @@ class ServerManagerTest {
     }
 
     @Test
+    fun `start launches fresh when existing server is alive but unhealthy`() {
+        var launched = false
+        val serverJsonPath = tempDir.resolve("server.json")
+        serverJsonPath.toFile().writeText(
+            """{"port":3100,"pid":12345,"token":"tok","startedAt":0}"""
+        )
+        // First health probe (the hung existing server) fails; after relaunch it succeeds.
+        var probes = 0
+
+        val manager = ServerManager(
+            projectDir = tempDir.toString(),
+            serverJsonPath = serverJsonPath,
+            processAliveChecker = { pid -> pid == 12345L },
+            processLauncher = { _ ->
+                launched = true
+                serverJsonPath.toFile().writeText(
+                    """{"port":3100,"pid":11111,"token":"tok","startedAt":0}"""
+                )
+                mockProcess(alive = true)
+            },
+            healthChecker = { probes++ > 0 },  // reuse probe = false, post-launch poll = true
+            executor = syncExecutor,
+        )
+
+        manager.start()
+
+        assertTrue(launched)
+        assertEquals(3100, manager.portFuture.get(5, TimeUnit.SECONDS))
+    }
+
+    @Test
     fun `start launches server when json exists but process dead`() {
         var launched = false
         val serverJsonPath = tempDir.resolve("server.json")

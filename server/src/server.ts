@@ -1,6 +1,7 @@
 import * as crypto from 'crypto';
 import type { FastifyInstance } from 'fastify';
 import * as fs from 'fs';
+import * as http from 'http';
 import * as os from 'os';
 import * as path from 'path';
 
@@ -63,22 +64,30 @@ export class PixelAgentsServer {
     assetCache?: AssetCache;
     onSetHooksEnabled?: SetHooksEnabledSideEffect;
   }): Promise<ServerConfig> {
-    // Check if another instance already has a server running
+    // Reuse another instance only if its process is alive AND it actually
+    // answers the health check. A hung/zombie server (alive PID, dead event
+    // loop) or a stale server.json left by a crash must NOT be trusted — that
+    // is what leaves the embedded browser stuck on "Loading..." forever.
     const existing = this.readServerJson();
     if (existing && isProcessRunning(existing.pid)) {
-      this.config = existing;
-      this.ownsServer = false;
-      console.log(
-        `[Pixel Agents] Reusing existing server on port ${existing.port} (PID ${existing.pid})`,
+      if (await isServerHealthy(existing.port, options?.host)) {
+        this.config = existing;
+        this.ownsServer = false;
+        console.log(
+          `[Pixel Agents] Reusing healthy server on port ${existing.port} (PID ${existing.pid})`,
+        );
+        return existing;
+      }
+      console.warn(
+        `[Pixel Agents] Stale server.json: PID ${existing.pid} alive but not healthy on port ${existing.port}; starting a fresh server`,
       );
-      return existing;
     }
 
     // Start our own server
     const token = crypto.randomUUID();
     const store = options?.store;
 
-    const { app, port } = await createHttpServer({
+    const { app, port } = await this.listenWithFallback({
       embedded: options?.embedded ?? true,
       host: options?.host,
       port: options?.port,
@@ -103,6 +112,26 @@ export class PixelAgentsServer {
     console.log(`[Pixel Agents] Server: listening on 127.0.0.1:${port}`);
 
     return this.config;
+  }
+
+  /**
+   * Listen on the requested port; if it's already taken (EADDRINUSE) — e.g. a
+   * hung previous server still squatting the fixed default port — fall back to
+   * an OS-assigned ephemeral port so startup still succeeds.
+   */
+  private async listenWithFallback(
+    opts: Parameters<typeof createHttpServer>[0],
+  ): ReturnType<typeof createHttpServer> {
+    try {
+      return await createHttpServer(opts);
+    } catch (e) {
+      const code = (e as NodeJS.ErrnoException)?.code;
+      if (code === 'EADDRINUSE' && opts.port !== 0) {
+        console.warn(`[Pixel Agents] Port ${opts.port} in use; retrying on an ephemeral port`);
+        return await createHttpServer({ ...opts, port: 0 });
+      }
+      throw e;
+    }
   }
 
   /** Stop the server and clean up server.json (only if we own it). */
@@ -178,4 +207,22 @@ function isProcessRunning(pid: number): boolean {
   } catch {
     return false;
   }
+}
+
+/** Probe GET /api/health with a short timeout. True only on HTTP 200. */
+function isServerHealthy(port: number, host?: string): Promise<boolean> {
+  return new Promise((resolve) => {
+    const req = http.get(
+      { host: host ?? '127.0.0.1', port, path: '/api/health', timeout: 1500 },
+      (res) => {
+        res.resume(); // drain
+        resolve(res.statusCode === 200);
+      },
+    );
+    req.on('timeout', () => {
+      req.destroy();
+      resolve(false);
+    });
+    req.on('error', () => resolve(false));
+  });
 }

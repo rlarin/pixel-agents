@@ -61,14 +61,24 @@ class ServerManager(
     val serverPort: Int get() = portFuture.getNow(DEFAULT_PORT)
 
     fun start() {
-        val existing = readServerJson()
-        if (existing != null && processAliveChecker(existing.pid)) {
-            config = existing
-            log.info("Pixel Agents server already running on port ${existing.port}")
-            portFuture.complete(existing.port)
-            return
-        }
-        executor(Runnable { launchServer() })
+        // Health-check off the EDT: a hung server (alive PID, dead HTTP) or a
+        // stale server.json from a crash would otherwise be trusted blindly,
+        // leaving the embedded browser stuck on "Loading..." forever.
+        executor(Runnable {
+            val existing = readServerJson()
+            if (existing != null && processAliveChecker(existing.pid) && healthChecker(existing.port)) {
+                config = existing
+                log.info("Reusing healthy Pixel Agents server on port ${existing.port}")
+                portFuture.complete(existing.port)
+                return@Runnable
+            }
+            if (existing != null) {
+                log.info(
+                    "Ignoring stale/unhealthy server.json (PID ${existing.pid}, port ${existing.port}); launching fresh server"
+                )
+            }
+            launchServer()
+        })
     }
 
     private fun readServerJson(): ServerConfig? {
