@@ -8,7 +8,7 @@ plugins {
 }
 
 group = "com.pixelagents"
-version = "0.3.7"
+version = "0.3.8"
 
 repositories {
     mavenCentral()
@@ -38,7 +38,7 @@ intellijPlatform {
     pluginConfiguration {
         id = "io.github.rlarin.pixelagents"
         name = "IT Crowd Pixel Agents"
-        version = "0.3.7"
+        version = "0.3.8"
         description = """
             JetBrains edition of Pixel Agents — a pixel art office where AI agents (Claude Code terminals)
             are animated characters you can watch work in real time.
@@ -49,6 +49,10 @@ intellijPlatform {
             Based on Pixel Agents by Pablo De Lucca (https://github.com/pixel-agents-hq/pixel-agents), MIT licensed.
         """.trimIndent()
         changeNotes = """
+            <h3>0.3.8</h3>
+            <ul>
+                <li><b>Idle agents start in the rest area</b> — on startup, restored agents that aren't actively working now appear seated at a non-work seat (couch, lounge chair) instead of at their desk, and lounge there until Claude picks up a new task.</li>
+            </ul>
             <h3>0.3.7</h3>
             <ul>
                 <li><b>Idle agents walk to the rest area</b> — when an agent finishes a turn it now walks to a non-work seat (couch, lounge chair — any chair not facing a screen) if one is free, instead of wandering aimlessly around the office.</li>
