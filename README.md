@@ -1,11 +1,4 @@
-<h1 align="center">
-    <a href="https://github.com/pixel-agents-hq/pixel-agents/discussions">
-        <img src="webview-ui/public/banner.png" alt="Pixel Agents">
-    </a>
-</h1>
-
-> **IT Crowd Pixel Agents** is a fork that adds JetBrains IDE support (PyCharm/WebStorm) and publishes under its own namespace.
-> Based on [Pixel Agents](https://github.com/pixel-agents-hq/pixel-agents) by **Pablo De Lucca**, MIT licensed. All upstream credit goes to the original author.
+<h1 align="center">IT Crowd Pixel Agents</h1>
 
 <h2 align="center" style="padding-bottom: 20px;">
   The game interface where AI agents build real things
@@ -13,17 +6,22 @@
 
 <div align="center" style="margin-top: 25px;">
 
-[![version](https://img.shields.io/endpoint?url=https%3A%2F%2Fgist.githubusercontent.com%2Fpablodelucca%2F3cd28398fa4a2c0a636e1d51d41aee39%2Fraw%2Fversion.json)](https://github.com/pixel-agents-hq/pixel-agents/releases)
-[![marketplaces](https://img.shields.io/endpoint?url=https%3A%2F%2Fgist.githubusercontent.com%2Fpablodelucca%2F3cd28398fa4a2c0a636e1d51d41aee39%2Fraw%2Finstalls.json)](https://marketplace.visualstudio.com/items?itemName=pablodelucca.pixel-agents)
-[![stars](https://img.shields.io/github/stars/pixel-agents-hq/pixel-agents?logo=github&color=0183ff&style=flat)](https://github.com/pixel-agents-hq/pixel-agents/stargazers)
-[![license](https://img.shields.io/github/license/pixel-agents-hq/pixel-agents?color=0183ff&style=flat)](https://github.com/pixel-agents-hq/pixel-agents/blob/main/LICENSE)
-[![good first issues](https://img.shields.io/github/issues/pixel-agents-hq/pixel-agents/good%20first%20issue?color=7057ff&label=good%20first%20issues)](https://github.com/pixel-agents-hq/pixel-agents/issues?q=is%3Aopen+is%3Aissue+label%3A%22good+first+issue%22)
+[![npm version](https://img.shields.io/npm/v/it-crowd-pixel-agents?color=0183ff&style=flat)](https://www.npmjs.com/package/it-crowd-pixel-agents)
+[![stars](https://img.shields.io/github/stars/rlarin/it-crowd-pixel-agents?logo=github&color=0183ff&style=flat)](https://github.com/rlarin/it-crowd-pixel-agents/stargazers)
+[![license](https://img.shields.io/github/license/rlarin/it-crowd-pixel-agents?color=0183ff&style=flat)](https://github.com/rlarin/it-crowd-pixel-agents/blob/main/LICENSE)
 
 </div>
 
 <div align="center">
-<a href="https://marketplace.visualstudio.com/items?itemName=pablodelucca.pixel-agents">🛒 VS Code Marketplace</a> • <a href="https://github.com/pixel-agents-hq/pixel-agents/discussions">💬 Discussions</a> • <a href="https://github.com/pixel-agents-hq/pixel-agents/issues">🐛 Issues</a> • <a href="CONTRIBUTING.md">🤝 Contributing</a> • <a href="CHANGELOG.md">📋 Changelog</a>
+<a href="https://marketplace.visualstudio.com/items?itemName=rlarin.it-crowd-pixel-agents">🛒 VS Code Marketplace</a> •
+<a href="https://plugins.jetbrains.com/plugin/27311-it-crowd-pixel-agents">🧠 JetBrains Marketplace</a> •
+<a href="https://github.com/rlarin/it-crowd-pixel-agents/issues">🐛 Issues</a> •
+<a href="CHANGELOG.md">📋 Changelog</a>
 </div>
+
+<br/>
+
+> Based on [Pixel Agents](https://github.com/pixel-agents-hq/pixel-agents) by **Pablo De Lucca**, MIT licensed. This fork adds JetBrains IDE support and a standalone CLI server.
 
 <br/>
 
@@ -53,21 +51,57 @@ This is the source code for the free Pixel Agents extension for VS Code — inst
 
 ## Requirements
 
-- VS Code 1.105.0 or later
 - [Claude Code CLI](https://docs.anthropic.com/en/docs/claude-code) installed and configured
-- **Platform**: Windows, Linux, and macOS are supported
+- **VS Code extension**: VS Code 1.105.0+
+- **JetBrains plugin**: IntelliJ Platform 2025.1+, Node.js 18+
+- **Platform**: Windows, Linux, and macOS
+
+## Install
+
+### VS Code extension
+
+Search **"IT Crowd Pixel Agents"** in the VS Code Extensions panel, or:
+
+```sh
+code --install-extension rlarin.it-crowd-pixel-agents
+```
+
+### JetBrains plugin (PyCharm, WebStorm, IntelliJ…)
+
+Install from the [JetBrains Marketplace](https://plugins.jetbrains.com/plugin/27311-it-crowd-pixel-agents) or search **"IT Crowd Pixel Agents"** inside your IDE's plugin settings.
+
+### npm / CLI
+
+```sh
+npm install -g it-crowd-pixel-agents
+```
+
+The CLI starts a standalone HTTP server and serves the Pixel Agents webview. It is used internally by the JetBrains plugin but can also be run directly:
+
+```sh
+it-crowd-pixel-agents [--host <host>] [--port <port>] [--project <dir>]
+```
+
+| Flag        | Default     | Description                                    |
+| ----------- | ----------- | ---------------------------------------------- |
+| `--host`    | `127.0.0.1` | HTTP server host                               |
+| `--port`    | auto        | HTTP server port                               |
+| `--project` | cwd         | Project directory to watch for Claude sessions |
 
 ## Getting Started
 
-If you just want to use Pixel Agents, the easiest way is to download the [VS Code extension](https://marketplace.visualstudio.com/items?itemName=pablodelucca.pixel-agents). If you want to play with the code, develop, or contribute, then:
+### VS Code
 
-### Install from source
+1. Open the **Pixel Agents** panel (bottom panel area, alongside your terminal)
+2. Click **+ Agent** to spawn a Claude Code terminal — a character appears in the office
+3. Watch your agents work
+
+### From source
 
 ```bash
-git clone https://github.com/pixel-agents-hq/pixel-agents.git
-cd pixel-agents
-npm install
-cd webview-ui && npm install && cd ..
+git clone https://github.com/rlarin/it-crowd-pixel-agents.git
+cd it-crowd-pixel-agents
+npm install && cd webview-ui && npm install && cd ..
 npm run build
 ```
 
@@ -75,8 +109,8 @@ Then press **F5** in VS Code to launch the Extension Development Host.
 
 ### Usage
 
-1. Open the **Pixel Agents** panel (it appears in the bottom panel area alongside your terminal)
-2. Click **+ Agent** to spawn a new Claude Code terminal and its character. Right-click for the option to launch with `--dangerously-skip-permissions` (bypasses all tool approval prompts)
+1. Open the **Pixel Agents** panel (bottom panel area, alongside your terminal)
+2. Click **+ Agent** to spawn a Claude Code terminal — right-click for `--dangerously-skip-permissions`
 3. Start coding with Claude — watch the character react in real time
 4. Click a character to select it, then click a seat to reassign it
 5. Click **Layout** to open the office editor and customize your space
@@ -150,27 +184,23 @@ We're actively working on the core module and adapter architecture that makes th
 
 ## Community & Contributing
 
-Use **[Issues](https://github.com/pixel-agents-hq/pixel-agents/issues)** to report bugs or request features. Join **[Discussions](https://github.com/pixel-agents-hq/pixel-agents/discussions)** for questions and conversations.
+Use **[Issues](https://github.com/rlarin/it-crowd-pixel-agents/issues)** to report bugs or request features.
 
 See [CONTRIBUTING.md](CONTRIBUTING.md) for instructions on how to contribute.
 
 Please read our [Code of Conduct](CODE_OF_CONDUCT.md) before participating.
 
-## Supporting the Project
+## Files written to disk
 
-If you find Pixel Agents useful, consider supporting its development:
-
-<a href="https://github.com/sponsors/pablodelucca">
-  <img src="https://img.shields.io/badge/Sponsor-GitHub-ea4aaa?logo=github" alt="GitHub Sponsors">
-</a>
-<a href="https://ko-fi.com/pablodelucca">
-  <img src="https://img.shields.io/badge/Support-Ko--fi-ff5e5b?logo=ko-fi" alt="Ko-fi">
-</a>
-
-## Star History
-
-[![Star History Chart](https://api.star-history.com/svg?repos=pixel-agents-hq/pixel-agents&type=Date)](https://www.star-history.com/?repos=pixel-agents-hq%2Fpixel-agents&type=date&legend=bottom-right)
+| Path                                   | Purpose                                        |
+| -------------------------------------- | ---------------------------------------------- |
+| `~/.pixel-agents/layout.json`          | Office layout (shared across all windows)      |
+| `~/.pixel-agents/config.json`          | User config (external asset directories, etc.) |
+| `~/.pixel-agents/hooks/claude-hook.js` | Hook listener script (copied on startup)       |
+| `~/.pixel-agents/server.json`          | Running server port + auth token               |
+| `~/.pixel-agents/server.log`           | Background server log                          |
 
 ## License
 
 This project is licensed under the [MIT License](LICENSE).
+Based on [Pixel Agents](https://github.com/pixel-agents-hq/pixel-agents) by Pablo De Lucca, MIT licensed.
