@@ -29,10 +29,19 @@ class ServerManager(
         ProcessHandle.of(pid).map { it.isAlive }.orElse(false)
     },
     private val processLauncher: (String) -> Process = { dir ->
-        val cmd = if (System.getProperty("os.name").startsWith("Windows"))
+        val cmd = if (System.getProperty("os.name").startsWith("Windows")) {
             listOf("cmd", "/c", "npx", "-y", "it-crowd-pixel-agents")
-        else
-            listOf("npx", "-y", "it-crowd-pixel-agents")
+        } else {
+            // macOS/Linux: a GUI-launched IDE (Finder/Dock) inherits only a
+            // minimal PATH (/usr/bin:/bin:/usr/sbin:/sbin) — it does NOT see
+            // Homebrew (/opt/homebrew/bin), nvm, fnm, volta, etc. Running `npx`
+            // directly then fails with "Node.js not found" even though Node is
+            // installed. Launch through a login+interactive shell so the user's
+            // profile (.zprofile/.zshrc, .bash_profile/.bashrc) populates PATH
+            // exactly as it would in their terminal.
+            val shell = System.getenv("SHELL")?.takeIf { it.isNotBlank() } ?: "/bin/zsh"
+            listOf(shell, "-ilc", "npx -y it-crowd-pixel-agents")
+        }
         // Run npx from a neutral directory (user home), NOT the project dir:
         // if the open project itself is the "it-crowd-pixel-agents" package
         // (e.g. its own repo), `npm exec` resolves the local package and fails
