@@ -132,11 +132,14 @@ async function main(): Promise<void> {
     runtime.hooksEnabled.current = adapter.getSetting('pixel-agents.hooksEnabled', true);
     runtime.watchAllSessions.current = adapter.getSetting('pixel-agents.watchAllSessions', false);
 
+    // Always copy the hook script so the path in settings.json stays valid even
+    // when hooks are toggled off and back on without restarting.
+    copyHookScript(distRoot);
+
     // Install hooks on startup if the persisted setting says so
     if (runtime.hooksEnabled.current) {
       try {
         await claudeProvider.installHooks(`http://127.0.0.1:${config.port}`, config.token);
-        copyHookScript(distRoot);
         console.log('[Pixel Agents] Hooks installed');
       } catch (err) {
         console.error('[Pixel Agents] Failed to install hooks:', err);

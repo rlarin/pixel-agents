@@ -8,6 +8,7 @@ import {
   FURNITURE_ANIM_INTERVAL_SEC,
   HUE_SHIFT_MIN_DEG,
   HUE_SHIFT_RANGE_DEG,
+  IDLE_HIDE_SEC,
   INACTIVE_SEAT_TIMER_MIN_SEC,
   INACTIVE_SEAT_TIMER_RANGE_SEC,
   WAITING_BUBBLE_DURATION_SEC,
@@ -230,6 +231,59 @@ export class OfficeState {
     if (pcSeats.length > 0) return pcSeats[Math.floor(Math.random() * pcSeats.length)];
     if (otherSeats.length > 0) return otherSeats[Math.floor(Math.random() * otherSeats.length)];
     return null;
+  }
+
+  /** Find an unassigned seat that does NOT face electronics — used as a rest/lounge seat for idle agents. */
+  private findRestSeat(excludeSeatId: string | null): string | null {
+    const electronicsTiles = new Set<string>();
+    for (const item of this.layout.furniture) {
+      const entry = getCatalogEntry(item.type);
+      if (!entry || entry.category !== 'electronics') continue;
+      for (let dr = 0; dr < entry.footprintH; dr++) {
+        for (let dc = 0; dc < entry.footprintW; dc++) {
+          electronicsTiles.add(`${item.col + dc},${item.row + dr}`);
+        }
+      }
+    }
+
+    const restSeats: string[] = [];
+    for (const [uid, seat] of this.seats) {
+      if (seat.assigned) continue;
+      if (uid === excludeSeatId) continue;
+      let facesPC = false;
+      const dCol =
+        seat.facingDir === Direction.RIGHT ? 1 : seat.facingDir === Direction.LEFT ? -1 : 0;
+      const dRow = seat.facingDir === Direction.DOWN ? 1 : seat.facingDir === Direction.UP ? -1 : 0;
+      for (let d = 1; d <= AUTO_ON_FACING_DEPTH && !facesPC; d++) {
+        const tileCol = seat.seatCol + dCol * d;
+        const tileRow = seat.seatRow + dRow * d;
+        if (electronicsTiles.has(`${tileCol},${tileRow}`)) {
+          facesPC = true;
+          break;
+        }
+        if (dCol !== 0) {
+          if (
+            electronicsTiles.has(`${tileCol},${tileRow - 1}`) ||
+            electronicsTiles.has(`${tileCol},${tileRow + 1}`)
+          ) {
+            facesPC = true;
+            break;
+          }
+        } else {
+          if (
+            electronicsTiles.has(`${tileCol - 1},${tileRow}`) ||
+            electronicsTiles.has(`${tileCol + 1},${tileRow}`)
+          ) {
+            facesPC = true;
+            break;
+          }
+        }
+      }
+      if (!facesPC) restSeats.push(uid);
+    }
+
+    if (restSeats.length === 0) return null;
+    return restSeats[Math.floor(Math.random() * restSeats.length)];
   }
 
   /**
@@ -568,6 +622,41 @@ export class OfficeState {
         ch.seatTimer = -1;
         ch.path = [];
         ch.moveProgress = 0;
+        // Move to a rest seat (non-PC-facing) if one is available
+        ch.workSeatId = ch.seatId;
+        const restSeatId = this.findRestSeat(ch.seatId);
+        if (restSeatId) {
+          if (ch.seatId) {
+            const oldSeat = this.seats.get(ch.seatId);
+            if (oldSeat) oldSeat.assigned = false;
+          }
+          const restSeat = this.seats.get(restSeatId)!;
+          restSeat.assigned = true;
+          ch.seatId = restSeatId;
+        }
+      } else {
+        // Restore work seat when becoming active again
+        ch.idleTime = 0;
+        if (ch.workSeatId != null) {
+          if (ch.seatId && ch.seatId !== ch.workSeatId) {
+            const restSeat = this.seats.get(ch.seatId);
+            if (restSeat) restSeat.assigned = false;
+            ch.seatId = null;
+          }
+          const workSeat = this.seats.get(ch.workSeatId);
+          if (workSeat && !workSeat.assigned) {
+            workSeat.assigned = true;
+            ch.seatId = ch.workSeatId;
+          } else {
+            // Work seat taken — find any free seat
+            const newSeatId = this.findFreeSeat();
+            if (newSeatId) {
+              this.seats.get(newSeatId)!.assigned = true;
+              ch.seatId = newSeatId;
+            }
+          }
+          ch.workSeatId = null;
+        }
       }
       this.rebuildFurnitureInstances();
     }
@@ -739,6 +828,11 @@ export class OfficeState {
         continue; // skip normal FSM while effect is active
       }
 
+      // Accumulate idle time for inactive non-subagent characters
+      if (!ch.isActive && !ch.isSubagent) {
+        ch.idleTime += dt;
+      }
+
       // Temporarily unblock own seat so character can pathfind to it
       this.withOwnSeatUnblocked(ch, () =>
         updateCharacter(ch, dt, this.walkableTiles, this.seats, this.tileMap, this.blockedTiles),
@@ -760,15 +854,16 @@ export class OfficeState {
   }
 
   getCharacters(): Character[] {
-    return Array.from(this.characters.values());
+    return Array.from(this.characters.values()).filter((ch) => ch.idleTime < IDLE_HIDE_SEC);
   }
 
   /** Get character at pixel position (for hit testing). Returns id or null. */
   getCharacterAt(worldX: number, worldY: number): number | null {
     const chars = this.getCharacters().sort((a, b) => b.y - a.y);
     for (const ch of chars) {
-      // Skip characters that are despawning
+      // Skip characters that are despawning or hidden due to long idle
       if (ch.matrixEffect === 'despawn') continue;
+      if (ch.idleTime >= IDLE_HIDE_SEC) continue;
       // Character sprite is 16x24, anchored bottom-center
       // Apply sitting offset to match visual position
       const sittingOffset = ch.state === CharacterState.TYPE ? CHARACTER_SITTING_OFFSET_PX : 0;

@@ -8,7 +8,7 @@ plugins {
 }
 
 group = "com.pixelagents"
-version = "0.3.5"
+version = "0.3.7"
 
 repositories {
     mavenCentral()
@@ -38,7 +38,7 @@ intellijPlatform {
     pluginConfiguration {
         id = "io.github.rlarin.pixelagents"
         name = "IT Crowd Pixel Agents"
-        version = "0.3.5"
+        version = "0.3.7"
         description = """
             JetBrains edition of Pixel Agents — a pixel art office where AI agents (Claude Code terminals)
             are animated characters you can watch work in real time.
@@ -49,6 +49,16 @@ intellijPlatform {
             Based on Pixel Agents by Pablo De Lucca (https://github.com/pixel-agents-hq/pixel-agents), MIT licensed.
         """.trimIndent()
         changeNotes = """
+            <h3>0.3.7</h3>
+            <ul>
+                <li><b>Idle agents walk to the rest area</b> — when an agent finishes a turn it now walks to a non-work seat (couch, lounge chair — any chair not facing a screen) if one is free, instead of wandering aimlessly around the office.</li>
+                <li><b>Long-idle agents disappear</b> — agents that have been inactive for 4 hours are hidden from the canvas. They reappear immediately the moment Claude picks up a new task.</li>
+                <li><b>Fix: "Cannot find module …claude-hook.js"</b> — the hook script is now always copied to <code>~/.pixel-agents/hooks/</code> on startup, so the path registered in <code>~/.claude/settings.json</code> is never stale even after a reinstall or a hooks toggle.</li>
+            </ul>
+            <h3>0.3.6</h3>
+            <ul>
+                <li><b>Fix: "Node.js not found" on macOS even when Node is installed</b> — a GUI-launched IDE inherits only a minimal PATH that excludes Homebrew, nvm, fnm and volta. The background server is now launched through your login shell, so it sees Node exactly as your terminal does.</li>
+            </ul>
             <h3>0.3.5</h3>
             <ul>
                 <li><b>Fix: tool window froze on "Loading…" after a while</b> — the background server's output is now written to a log file instead of an undrained pipe. Previously the pipe's buffer could fill and block the server's event loop, leaving it alive but unresponsive. Server logs are now at <code>~/.pixel-agents/server.log</code>.</li>

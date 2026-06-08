@@ -196,4 +196,8 @@ export interface Character {
   inputTokens: number;
   /** Cumulative output tokens consumed */
   outputTokens: number;
+  /** Seconds of continuous inactivity. Hidden from canvas when ≥ IDLE_HIDE_SEC. Reset on activation. */
+  idleTime: number;
+  /** Work seat uid saved when the agent walks to a rest seat while idle. Restored on activation. */
+  workSeatId?: string | null;
 }

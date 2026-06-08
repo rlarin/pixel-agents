@@ -132,12 +132,13 @@ export class PixelAgentsViewProvider implements vscode.WebviewViewProvider {
       .then((config) => {
         // Server always starts regardless of hooks-enabled state.
         // It's the foundation for WebSocket transport and health monitoring.
-        // Only hook installation/script-copy is gated by the toggle.
+        // Script is always copied so the path registered in settings.json is valid.
+        // Hook installation/uninstallation is still gated by the toggle.
+        copyHookScript(this.context.extensionPath);
         const hooksEnabled = this.adapter.getSetting<boolean>(GLOBAL_KEY_HOOKS_ENABLED, true);
         this.runtime.hooksEnabled.current = hooksEnabled;
         if (hooksEnabled) {
           void claudeProvider.installHooks(`http://127.0.0.1:${config.port}`, config.token);
-          copyHookScript(this.context.extensionPath);
         }
         console.log(`[Pixel Agents] Server: ready on port ${config.port}`);
       })
