@@ -321,6 +321,7 @@ export class OfficeState {
     preferredSeatId?: string,
     skipSpawnEffect?: boolean,
     folderName?: string,
+    idle?: boolean,
   ): void {
     if (this.characters.has(id)) return;
 
@@ -337,14 +338,33 @@ export class OfficeState {
 
     // Try preferred seat first, then any free seat
     let seatId: string | null = null;
-    if (preferredSeatId && this.seats.has(preferredSeatId)) {
-      const seat = this.seats.get(preferredSeatId)!;
-      if (!seat.assigned) {
-        seatId = preferredSeatId;
+    let workSeatId: string | null = null;
+    if (idle) {
+      // Restored idle agent: remember its work seat but seat it at a rest
+      // (non-PC-facing) seat so it lounges instead of appearing to work on load.
+      if (preferredSeatId && this.seats.has(preferredSeatId)) {
+        workSeatId = preferredSeatId;
       }
-    }
-    if (!seatId) {
-      seatId = this.findFreeSeat();
+      seatId = this.findRestSeat(workSeatId);
+      if (!seatId) {
+        // No rest seat available — fall back to the work seat / any free seat.
+        if (workSeatId && !this.seats.get(workSeatId)!.assigned) {
+          seatId = workSeatId;
+        } else {
+          seatId = this.findFreeSeat();
+        }
+        workSeatId = null;
+      }
+    } else {
+      if (preferredSeatId && this.seats.has(preferredSeatId)) {
+        const seat = this.seats.get(preferredSeatId)!;
+        if (!seat.assigned) {
+          seatId = preferredSeatId;
+        }
+      }
+      if (!seatId) {
+        seatId = this.findFreeSeat();
+      }
     }
 
     let ch: Character;
@@ -372,6 +392,12 @@ export class OfficeState {
       ch.matrixEffect = 'spawn';
       ch.matrixEffectTimer = 0;
       ch.matrixEffectSeeds = matrixEffectSeeds();
+    }
+    if (idle) {
+      // Sit at the rest seat, then naturally start wandering after a short rest.
+      ch.isActive = false;
+      ch.workSeatId = workSeatId;
+      ch.seatTimer = INACTIVE_SEAT_TIMER_MIN_SEC + Math.random() * INACTIVE_SEAT_TIMER_RANGE_SEC;
     }
     this.characters.set(id, ch);
   }
