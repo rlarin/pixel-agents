@@ -39,3 +39,9 @@ jobs:
           files: jetbrains-plugin/build/distributions/*.zip
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Publish to JetBrains Marketplace
+        working-directory: jetbrains-plugin
+        run: ./gradlew publishPlugin
+        env:
+          JETBRAINS_MARKETPLACE_TOKEN: ${{ secrets.JETBRAINS_MARKETPLACE_TOKEN }}
