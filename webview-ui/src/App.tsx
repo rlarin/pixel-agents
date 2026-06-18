@@ -358,6 +358,8 @@ function App() {
         isSettingsOpen={isSettingsOpen}
         onToggleSettings={() => setIsSettingsOpen((v) => !v)}
         workspaceFolders={workspaceFolders}
+        agentCount={agents.filter((id) => id > 0).length}
+        workSeatCount={getOfficeState().workSeatCount()}
       />
 
       <VersionIndicator

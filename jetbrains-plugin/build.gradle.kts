@@ -8,7 +8,7 @@ plugins {
 }
 
 group = "com.pixelagents"
-version = "0.3.8"
+version = "0.3.10"
 
 repositories {
     mavenCentral()
@@ -38,7 +38,7 @@ intellijPlatform {
     pluginConfiguration {
         id = "io.github.rlarin.pixelagents"
         name = "IT Crowd Pixel Agents"
-        version = "0.3.8"
+        version = "0.3.10"
         description = """
             JetBrains edition of Pixel Agents — a pixel art office where AI agents (Claude Code terminals)
             are animated characters you can watch work in real time.
@@ -49,6 +49,16 @@ intellijPlatform {
             Based on Pixel Agents by Pablo De Lucca (https://github.com/pixel-agents-hq/pixel-agents), MIT licensed.
         """.trimIndent()
         changeNotes = """
+            <h3>0.3.10</h3>
+            <ul>
+                <li><b>Fix: idle agents now correctly leave after 5 minutes</b> — on reconnect the server was sending the layout before the agent list, so restored agents were never added to the canvas and the idle-hide timer never ran. Fixed message ordering so agents are buffered correctly before the layout flush.</li>
+                <li><b>Agent limit enforced by work stations</b> — the "+ Agent" button is now disabled when all PC-facing seats are occupied. Hovering shows the current count (e.g. "All work stations are occupied (3/3)").</li>
+            </ul>
+            <h3>0.3.9</h3>
+            <ul>
+                <li><b>Only active agents appear on startup</b> — when the panel opens, idle agents are no longer shown. Restored agents start hidden and appear the moment Claude gives them a task; agents that go idle while you watch stay visible.</li>
+                <li><b>Idle agents leave after 5 minutes</b> — lowered the long-idle timeout from 4 hours to 5 minutes. An idle agent leaves the office after 5 minutes and returns instantly when it picks up new work.</li>
+            </ul>
             <h3>0.3.8</h3>
             <ul>
                 <li><b>Idle agents start in the rest area</b> — on startup, restored agents that aren't actively working now appear seated at a non-work seat (couch, lounge chair) instead of at their desk, and lounge there until Claude picks up a new task.</li>

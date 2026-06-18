@@ -177,11 +177,7 @@ function handleWebviewReady(send: WsSend, ctx: ClientMessageContext): void {
     }
   }
 
-  // 3. Layout (saved file, or bundled default)
-  const savedLayout = readLayoutFromFile();
-  send({ type: 'layoutLoaded', layout: savedLayout ?? cache?.defaultLayout ?? null });
-
-  // 4. Settings (from adapter, with sensible defaults when adapter is absent)
+  // 3. Settings (from adapter, with sensible defaults when adapter is absent)
   const cfg = readConfig();
   const watchAllSessions = adapter?.getSetting(KEY_WATCH_ALL_SESSIONS, false) ?? false;
   const hooksEnabled = adapter?.getSetting(KEY_HOOKS_ENABLED, true) ?? true;
@@ -204,10 +200,11 @@ function handleWebviewReady(send: WsSend, ctx: ClientMessageContext): void {
     runtime.hooksEnabled.current = hooksEnabled;
   }
 
-  // 5. Restore persisted external agents (standalone only; VS Code handles its own restore)
+  // 4. Restore persisted external agents (standalone only; VS Code handles its own restore)
   runtime?.restoreExternalAgents();
 
-  // 6. Existing agents (either just restored, or from VS Code adapter if present)
+  // 5. Existing agents — must arrive BEFORE layoutLoaded so the webview's pendingAgents
+  // buffer is populated when layoutLoaded fires and flushes it.
   const agentIds: number[] = [];
   const folderNames: Record<number, string> = {};
   const externalAgents: Record<number, boolean> = {};
@@ -228,4 +225,20 @@ function handleWebviewReady(send: WsSend, ctx: ClientMessageContext): void {
     folderNames,
     externalAgents,
   });
+
+  // 6. Layout — triggers pendingAgents flush in the webview (agents added as idle/hidden)
+  const savedLayout = readLayoutFromFile();
+  send({ type: 'layoutLoaded', layout: savedLayout ?? cache?.defaultLayout ?? null });
+
+  // 7. Re-send current agent statuses so the webview can reveal active agents
+  // (mirrors VS Code's sendCurrentAgentStatuses called after layoutLoaded).
+  for (const [id, agent] of store) {
+    for (const [toolId, status] of agent.activeToolStatuses) {
+      const toolName = agent.activeToolNames.get(toolId) ?? '';
+      send({ type: 'agentToolStart', id, toolId, status, toolName });
+    }
+    if (agent.isWaiting) {
+      send({ type: 'agentStatus', id, status: 'waiting' });
+    }
+  }
 }

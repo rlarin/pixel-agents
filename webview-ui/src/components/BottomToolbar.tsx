@@ -13,6 +13,8 @@ interface BottomToolbarProps {
   isSettingsOpen: boolean;
   onToggleSettings: () => void;
   workspaceFolders: WorkspaceFolder[];
+  agentCount: number;
+  workSeatCount: number;
 }
 
 export function BottomToolbar({
@@ -22,6 +24,8 @@ export function BottomToolbar({
   isSettingsOpen,
   onToggleSettings,
   workspaceFolders,
+  agentCount,
+  workSeatCount,
 }: BottomToolbarProps) {
   const [isFolderPickerOpen, setIsFolderPickerOpen] = useState(false);
   const [isBypassMenuOpen, setIsBypassMenuOpen] = useState(false);
@@ -41,6 +45,7 @@ export function BottomToolbar({
   }, [isFolderPickerOpen, isBypassMenuOpen]);
 
   const hasMultipleFolders = workspaceFolders.length > 1;
+  const atCapacity = workSeatCount > 0 && agentCount >= workSeatCount;
 
   const handleAgentClick = () => {
     setIsBypassMenuOpen(false);
@@ -53,7 +58,7 @@ export function BottomToolbar({
   };
 
   const handleAgentHover = () => {
-    if (!isFolderPickerOpen) {
+    if (!atCapacity && !isFolderPickerOpen) {
       setIsBypassMenuOpen(true);
     }
   };
@@ -92,12 +97,18 @@ export function BottomToolbar({
           onMouseLeave={handleAgentLeave}
         >
           <Button
-            variant="accent"
-            onClick={handleAgentClick}
+            variant={atCapacity ? 'disabled' : 'accent'}
+            onClick={atCapacity ? undefined : handleAgentClick}
+            disabled={atCapacity}
+            title={
+              atCapacity
+                ? `All work stations are occupied (${agentCount}/${workSeatCount})`
+                : undefined
+            }
             className={
-              isFolderPickerOpen || isBypassMenuOpen
+              !atCapacity && (isFolderPickerOpen || isBypassMenuOpen)
                 ? 'bg-accent-bright'
-                : 'bg-accent hover:bg-accent-bright'
+                : undefined
             }
           >
             + Agent
