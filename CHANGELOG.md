@@ -1,5 +1,12 @@
 # Changelog
 
+## v1.3.15
+
+### Features
+
+- **Hide idle agents on startup** — When the panel loads, only currently active agents appear. Agents that were idle are no longer restored as on-screen characters; they show up again the moment they become active.
+- **Idle agents leave after 5 minutes** — Reduced the idle-hide threshold from 4 hours to 5 minutes. An agent that sits idle for 5 minutes leaves the office and reappears as soon as it resumes activity.
+
 ## v1.3.0
 
 ### Features

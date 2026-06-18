@@ -398,6 +398,11 @@ export class OfficeState {
       ch.isActive = false;
       ch.workSeatId = workSeatId;
       ch.seatTimer = INACTIVE_SEAT_TIMER_MIN_SEC + Math.random() * INACTIVE_SEAT_TIMER_RANGE_SEC;
+      // Restored agents are hidden on startup — only agents that become active
+      // (their status re-sent after restore) are revealed. setAgentActive(true)
+      // resets idleTime to 0 and shows the character. Agents that go idle later
+      // (after being shown) accumulate idleTime normally and hide after IDLE_HIDE_SEC.
+      ch.idleTime = IDLE_HIDE_SEC;
     }
     this.characters.set(id, ch);
   }
