@@ -8,7 +8,7 @@ plugins {
 }
 
 group = "com.pixelagents"
-version = "0.3.10"
+version = "0.3.11"
 
 repositories {
     mavenCentral()
@@ -38,7 +38,7 @@ intellijPlatform {
     pluginConfiguration {
         id = "io.github.rlarin.pixelagents"
         name = "IT Crowd Pixel Agents"
-        version = "0.3.10"
+        version = "0.3.11"
         description = """
             JetBrains edition of Pixel Agents — a pixel art office where AI agents (Claude Code terminals)
             are animated characters you can watch work in real time.
@@ -49,6 +49,10 @@ intellijPlatform {
             Based on Pixel Agents by Pablo De Lucca (https://github.com/pixel-agents-hq/pixel-agents), MIT licensed.
         """.trimIndent()
         changeNotes = """
+            <h3>0.3.11</h3>
+            <ul>
+                <li><b>Fix: restored agents now appear immediately on load</b> — previously idle agents were hidden on startup and only revealed once they became active, so you had to click "Refresh agents" to see them. Restored agents (already filtered to live terminals) are now visible right away; the 5-minute idle-hide still applies to agents that go idle during the session.</li>
+            </ul>
             <h3>0.3.10</h3>
             <ul>
                 <li><b>Fix: idle agents now correctly leave after 5 minutes</b> — on reconnect the server was sending the layout before the agent list, so restored agents were never added to the canvas and the idle-hide timer never ran. Fixed message ordering so agents are buffered correctly before the layout flush.</li>

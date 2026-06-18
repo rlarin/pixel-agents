@@ -36,13 +36,13 @@ export const changelogEntries: ChangelogEntry[] = [
           'Multi-root workspace agent detection across all workspace folders',
           'Load custom characters from external asset directories',
           'Tailwind CSS v4 migration for the webview UI',
-          'Idle agents are now hidden on startup — only active agents appear when the panel loads',
           'Idle agents leave the office after 5 minutes of inactivity and return as soon as they become active again',
         ],
       },
       {
         title: 'Fixes',
         items: [
+          'Restored agents now appear immediately on load — no more clicking Refresh to see them',
           'Prevent duplicate restores, fix tool status reconnect, improve agent tool detection',
         ],
       },

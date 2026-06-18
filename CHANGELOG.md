@@ -1,5 +1,11 @@
 # Changelog
 
+## v1.3.17
+
+### Fixes
+
+- **Restored agents now appear immediately on load** — Previously, idle agents were hidden on startup and only revealed once they became active, so you had to click "Refresh agents" to see them. Restored agents (already filtered to live terminals/transcripts) are now visible right away. The 5-minute idle-hide still applies to agents that go idle during the session.
+
 ## v1.3.15
 
 ### Features

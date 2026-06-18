@@ -406,11 +406,12 @@ export class OfficeState {
       ch.isActive = false;
       ch.workSeatId = workSeatId;
       ch.seatTimer = INACTIVE_SEAT_TIMER_MIN_SEC + Math.random() * INACTIVE_SEAT_TIMER_RANGE_SEC;
-      // Restored agents are hidden on startup — only agents that become active
-      // (their status re-sent after restore) are revealed. setAgentActive(true)
-      // resets idleTime to 0 and shows the character. Agents that go idle later
-      // (after being shown) accumulate idleTime normally and hide after IDLE_HIDE_SEC.
-      ch.idleTime = IDLE_HIDE_SEC;
+      // Restored agents are visible immediately — they were already filtered to
+      // live terminals / existing transcripts in restoreAgents, so they are real
+      // and should appear on load (no need to wait for a status re-send, which
+      // never arrives for genuinely idle agents). They accumulate idleTime from 0
+      // and hide normally after IDLE_HIDE_SEC if they stay idle during the session.
+      ch.idleTime = 0;
     }
     this.characters.set(id, ch);
   }
